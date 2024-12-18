@@ -24,6 +24,11 @@ class User extends Authenticatable
         'role'
     ];
 
+    public function doctor()
+    {
+        return $this->hasOne(Doctor::class);  // Assuming one user has one doctor profile
+    }    
+
     /**
      * The attributes that should be hidden for serialization.
      *

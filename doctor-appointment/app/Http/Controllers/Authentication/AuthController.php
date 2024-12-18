@@ -5,10 +5,13 @@ namespace App\Http\Controllers\Authentication;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Authentication\LoginRequest;
 use App\Http\Requests\Authentication\RegisterRequest;
+use App\Mail\UserRegistered;
+use App\Models\Doctor;
 use App\Models\User;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth ;
+use Illuminate\Support\Facades\Mail;
 
 class AuthController extends Controller
 {
@@ -21,6 +24,19 @@ class AuthController extends Controller
             'password' => bcrypt($request->password),
             'role' => $request->role
         ]); 
+
+        if(strtolower($request->role) === 'doctor') {
+            Doctor::create([
+                'user_id' => $user->id, 
+                'specialization' => $request->specialization, 
+                'bio' => $request->bio, 
+                'clinic_address' => $request->clinic_address, 
+                'start_time' => $request->start_time, 
+                'end_time' => $request->end_time
+            ]);
+        }
+
+        Mail::to($user->email)->send(new UserRegistered($user));
         return $this->ok('User Registered Successfully');       
     }
 
